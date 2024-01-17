@@ -1,7 +1,7 @@
 -- Check if the table already exists before creating
 -- Create the users table
-    CREATE TABLE IF NOT EXIST users (
+CREATE TABLE IF NOT EXISTS users (
 	id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,       
         email VARCHAR(255) NOT NULL UNIQUE,
-        name VARCHAR(255),
-    );
+        name VARCHAR(255)
+);
