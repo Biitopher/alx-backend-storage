@@ -7,9 +7,7 @@ def top_students(mongo_collection):
     pipeline = [
         {
             "$project": {
-                "_id": 1,
-                "name": 1,
-                "scores": 1,
+                "name": "$name",
                 "averageScore": {"$avg": "$scores.score"}
             }
         },
@@ -18,6 +16,4 @@ def top_students(mongo_collection):
         }
     ]
 
-    result = mongo_collection.aggregate(pipeline)
-
-    return list(result)
+    return mongo_collection.aggregate(pipeline)
