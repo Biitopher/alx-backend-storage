@@ -30,6 +30,19 @@ def call_history(method: Callable) -> Callable:
 
     return wrapper
 
+def replay(self, method: Callable) -> None:
+        """Display history of calls"""
+        inputs_key = f'{method.__qualname__}:inputs'
+        outputs_key = f'{method.__qualname__}:outputs'
+
+        inputs_list = self._redis.lrange(inputs_key, 0, -1)
+        outputs_list = self._redis.lrange(outputs_key, 0, -1)
+
+        print(f"{method.__qualname__} was called {len(inputs_list)} times:")
+        for inputs, output in zip(inputs_list, outputs_list):
+            print(f"{method.__qualname__}(*{inputs.decode(
+                    'utf-8').split(', ')}) -> {output.decode('utf-8')}")
+
 class Cache:
     def __init__(self, host='localhost', port=6379, db=0):
         """Initialize"""
