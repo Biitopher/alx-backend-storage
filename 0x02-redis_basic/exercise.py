@@ -35,14 +35,11 @@ def call_history(method: Callable) -> Callable:
 def replay(function: Callable) -> None:
     """Display the history of calls"""
     user = redis.Redis()
-
     calls = int(user.get(function.__qualname__) or 0)
-
     inputs = [input.decode('utf-8') for input in
               user.lrange(f'{function.__qualname__}:inputs', 0, -1)]
     outputs = [output.decode('utf-8') for output in
                user.lrange(f'{function.__qualname__}:outputs', 0, -1)]
-
     print(f'{function.__qualname__} was called {calls} times:')
     for input, output in zip(inputs, outputs):
         print(f'{function.__qualname__}(*{input}) -> {output}')
