@@ -3,34 +3,29 @@
 import requests
 import redis
 from functools import wraps
+from typing import Callable
+
 
 redis_client = redis.Redis()
 
 
-def cache_with_count(url, expiration=10):
+def cache_with_count(method: Callable) -> Callable:
     """Decorator to cache function result with count and expiration time"""
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            count_key = f"count:{url}"
-
-            redis_client.incr(count_key)
-
-            result_key = f"result:{url}"
-
-            cached_result = redis_client.get(result_key)
-            if cached_result is not None:
-                return cached_result.decode('utf-8')
-
-            result = func(*args, **kwargs)
-
-            redis_client.setex(result_key, expiration, result)
-
-            return result
-        return wrapper
+    @wraps(method)
+        def decorator(url) -> str:
+        """The wrapper function"""
+        redis_client.incr(f'count:{url}')
+        result = redis_client.get(f'result:{url}')
+        if result:
+            return result.decode('utf-8')
+        result = method(url)
+        redis_client.set(f'count:{url}', 0)
+        redis_client.setex(f'result:{url}', 10, result)
+        return result
     return decorator
 
-@cache_with_count(url="http://slowwly.robertomurray.co.uk/delay/1000/url/https://www.example.com")
+
+@cache_with_count
 def get_page(url: str) -> str:
     """Fetches the HTML content of a URL using requests"""
     response = requests.get(url)
