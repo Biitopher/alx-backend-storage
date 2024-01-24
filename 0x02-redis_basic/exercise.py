@@ -36,7 +36,7 @@ def replay(function: Callable) -> None:
     """Display the history of calls"""
     user = redis.Redis()
 
-    calls = int(client.get(function.__qualname__) or 0)
+    calls = int(user.get(function.__qualname__) or 0)
 
     inputs = [input.decode('utf-8') for input in
               user.lrange(f'{function.__qualname__}:inputs', 0, -1)]
