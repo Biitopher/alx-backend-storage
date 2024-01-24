@@ -21,10 +21,11 @@ def call_history(method: Callable) -> Callable:
     @wraps(method)
     def wrapper(self: Any, *args, **kwargs) -> str:
         """Wrapped functiion"""
-        key = f'{method.__qualname__}:inputs', str(args)
+        input_key = f'{method.__qualname__}:inputs'
+        output_key = f'{method.__qualname__}:outputs'
         result = method(self, *args, **kwargs)
-        self._redis.rpush(key)
-        self._redis.rpush(f'{method.__qualname__}:outputs', output)
+        self._redis.rpush(input_key, str(args))
+        self._redis.rpush(output_key, str(result))
         return result
 
     return wrapper
@@ -36,6 +37,7 @@ class Cache:
         self._redis.flushdb()
 
     @count_calls
+    @call_history
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """defines storage"""
         key = str(uuid.uuid4())
