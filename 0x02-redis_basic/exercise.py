@@ -10,10 +10,11 @@ def count_calls(method: Callable) -> Callable:
     """ Decorator for Cache class methods to track call count"""
     @wraps(method)
     def wrapper(self: Any, *args, **kwargs) -> str:
-        """ Wraps called method adds call count redis before execution""" 
+        """ Wraps called method adds call count redis before execution"""
         self._redis.incr(method.__qualname__)
         return method(self, *args, **kwargs)
     return wrapper
+
 
 def call_history(method: Callable) -> Callable:
     """Counts how many times cache class are called"""
@@ -30,6 +31,7 @@ def call_history(method: Callable) -> Callable:
 
     return wrapper
 
+
 def replay(function: Callable) -> None:
     """Display the history of calls"""
     user = redis.Redis()
@@ -44,6 +46,7 @@ def replay(function: Callable) -> None:
     print(f'{fn.__qualname__} was called {calls} times:')
     for input, output in zip(inputs, outputs):
         print(f'{fn.__qualname__}(*{input}) -> {output}')
+
 
 class Cache:
     def __init__(self, host='localhost', port=6379, db=0):
