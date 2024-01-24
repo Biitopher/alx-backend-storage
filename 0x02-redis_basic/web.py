@@ -12,7 +12,7 @@ redis_client = redis.Redis()
 def cache_with_count(method: Callable) -> Callable:
     """Decorator to cache function result with count and expiration time"""
     @wraps(method)
-        def decorator(url) -> str:
+    def decorator(url) -> str:
         """The wrapper function"""
         redis_client.incr(f'count:{url}')
         result = redis_client.get(f'result:{url}')
@@ -30,4 +30,3 @@ def get_page(url: str) -> str:
     """Fetches the HTML content of a URL using requests"""
     response = requests.get(url)
     return response.text
-
